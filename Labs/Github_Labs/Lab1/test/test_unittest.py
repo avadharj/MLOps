@@ -2,7 +2,6 @@ import sys
 import os
 import unittest
 
-# Get the path to the project's root directory
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(project_root)
 
@@ -14,7 +13,6 @@ class TestCalculator(unittest.TestCase):
     def test_fun1(self):
         self.assertEqual(calculator.fun1(2, 3), 5)
         self.assertEqual(calculator.fun1(5, 0), 5)
-        
         self.assertEqual(calculator.fun1(-1, 1), 0)
         self.assertEqual(calculator.fun1(-1, -1), -2)
 
@@ -36,6 +34,19 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(calculator.fun4(-1, -1, -1), -3)
         self.assertEqual(calculator.fun4(-1, -1, 100), 98)
 
+    def test_fun5(self):
+        self.assertEqual(calculator.fun5(0), 1)
+        self.assertEqual(calculator.fun5(1), 1)
+        self.assertEqual(calculator.fun5(5), 120)
+        self.assertEqual(calculator.fun5(10), 3628800)
+
+    def test_fun5_errors(self):
+        with self.assertRaises(ValueError):
+            calculator.fun5(-1)  
+        with self.assertRaises(ValueError):
+            calculator.fun5(3.5)  
+        with self.assertRaises(ValueError):
+            calculator.fun5("5") 
 
 
 if __name__ == '__main__':
