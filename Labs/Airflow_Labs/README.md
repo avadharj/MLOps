@@ -82,3 +82,37 @@ Why not Airflow™?
 Airflow™ was built for finite batch workflows. While the CLI and REST API do allow triggering workflows, Airflow was not built for infinitely running event-based workflows. Airflow is not a streaming solution. However, a streaming system such as Apache Kafka is often seen working together with Apache Airflow. Kafka can be used for ingestion and processing in real-time, event data is written to a storage location, and Airflow periodically starts a workflow processing a batch of data.
 
 If you prefer clicking over coding, Airflow is probably not the right solution. The web interface aims to make managing workflows as easy as possible and the Airflow framework is continuously improved to make the developer experience as smooth as possible. However, the philosophy of Airflow is to define workflows as code so coding will always be required.
+
+This `docker-compose.yaml` file defines a robust, distributed Airflow environment using the **CeleryExecutor**. This setup separates the various responsibilities of Airflow into distinct containers for scalability and reliability.
+
+---
+
+## 🏗️ Core Airflow Services
+
+* **`airflow-scheduler`**: The "brain." It monitors DAGs, schedules tasks based on dependencies, and sends them to the queue.
+* **`airflow-worker`**: The "muscle." These containers listen to the Celery queue (Redis) and actually execute the task code.
+* **`airflow-apiserver`**: The "interface." It serves the Web UI and the REST API, allowing you to manage and monitor your pipelines.
+* **`airflow-dag-processor`**: The "parser." It reads DAG files from the volume and converts them into a format the database can understand.
+* **`airflow-triggerer`**: The "waiter." It handles "deferrable" operators (tasks that wait for external events without occupying a worker slot).
+* **`airflow-init`**: The "setup." A short-lived container that runs database migrations and creates the initial admin user.
+
+## 🗄️ Infrastructure Components
+
+* **`postgres`**: The **Metadata Database**. It stores everything: task states, job history, user info, and DAG definitions.
+* **`redis`**: The **Broker**. In a Celery setup, this acts as the message queue that passes task commands from the Scheduler to the Workers.
+* **`flower`** (Optional): A monitoring tool specifically for the Celery cluster to track worker health and task progress.
+
+---
+
+
+## 🔄 Airflow Component Flowchart
+
+![Graph](assets/Airflow.png)
+
+
+---
+
+### Key Takeaway
+
+> **The Golden Rule:** The Scheduler says *what* to do, Redis holds the *to-do list*, the Workers *do* the work, and Postgres *records* that it happened.
+
