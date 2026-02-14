@@ -1,0 +1,17 @@
+# Airflow
+logs/
+plugins/
+working_data/
+__pycache__/
+*.pyc
+
+# Docker
+.env
+
+# Models (generated at runtime)
+dags/model/*.sav
+dags/model/*.json
+
+# OS
+.DS_Store
+Thumbs.db
