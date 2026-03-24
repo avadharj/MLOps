@@ -1,31 +1,41 @@
 from flask import Flask, request, jsonify
-from predict import predict_iris
+from predict import predict_cancer
 import os
 
 app = Flask(__name__)
 
 # Map numeric model output to human-readable class
 label_map = {
-    0: "setosa",
-    1: "versicolor",
-    2: "virginica"
+    0: "malignant",
+    1: "benign"
 }
+
+# The 30 feature names expected by the model (from sklearn.datasets.load_breast_cancer)
+FEATURE_NAMES = [
+    "mean_radius", "mean_texture", "mean_perimeter", "mean_area",
+    "mean_smoothness", "mean_compactness", "mean_concavity",
+    "mean_concave_points", "mean_symmetry", "mean_fractal_dimension",
+    "radius_error", "texture_error", "perimeter_error", "area_error",
+    "smoothness_error", "compactness_error", "concavity_error",
+    "concave_points_error", "symmetry_error", "fractal_dimension_error",
+    "worst_radius", "worst_texture", "worst_perimeter", "worst_area",
+    "worst_smoothness", "worst_compactness", "worst_concavity",
+    "worst_concave_points", "worst_symmetry", "worst_fractal_dimension"
+]
 
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
 
-    sepal_length = float(data['sepal_length'])
-    sepal_width  = float(data['sepal_width'])
-    petal_length = float(data['petal_length'])
-    petal_width  = float(data['petal_width'])
+    # Extract all 30 features from the request
+    features = [float(data[name]) for name in FEATURE_NAMES]
 
-    print(sepal_length, sepal_width, petal_length, petal_width)
+    print("Input features:", features)
 
-    # call model
-    prediction = predict_iris(sepal_length, sepal_width, petal_length, petal_width)
+    # Call model
+    prediction = predict_cancer(features)
 
-    # convert numeric class → label string for frontend
+    # Convert numeric class to label string for frontend
     try:
         pred_int = int(prediction)
         pred_label = label_map.get(pred_int, str(pred_int))
@@ -40,3 +50,4 @@ if __name__ == '__main__':
         host="0.0.0.0",
         port=int(os.environ.get("PORT", 8080))
     )
+    
